@@ -20,7 +20,7 @@ SoothPredictor;
 
 //------------------------------------------------------------------------------
 
-SoothPredictor * sooth_predictor_init(uint32_t error_symbol);
+SoothPredictor * sooth_predictor_init();
 void sooth_predictor_free(SoothPredictor * predictor);
 void sooth_predictor_save(const char * const filename, SoothPredictor * predictor);
 SoothPredictor * sooth_predictor_load(const char * const filename);

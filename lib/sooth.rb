@@ -1,1 +1,1 @@
-require 'sooth/predictor'
+require 'sooth_native'

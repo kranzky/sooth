@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 SoothPredictor *
-sooth_predictor_init(uint32_t error_symbol)
+sooth_predictor_init()
 {
   SoothPredictor * predictor = malloc(sizeof(SoothPredictor));
 
@@ -17,7 +17,7 @@ sooth_predictor_init(uint32_t error_symbol)
     return NULL;
   }
 
-  predictor->error_symbol = error_symbol;
+  predictor->error_symbol = 0;
 
   predictor->contexts = NULL;
   predictor->contexts_size = 0;
