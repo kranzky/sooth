@@ -11,7 +11,7 @@ Sooth is a simple stochastic predictive model.
 Getting Started
 ---------------
 
-Apart from the examples on this page, look at the [API docs](http://rubydoc.info/github/jasonhutchens/sooth/master/frames) to get up to speed.
+Apart from the specs, look at the [API docs](http://rubydoc.info/github/jasonhutchens/sooth/master/frames) to get up to speed.
 
 Contributing to Sooth
 ---------------------
