@@ -82,6 +82,10 @@ sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
       }
       else if (context->bigram[0] > bigram[0] || context->bigram[0] == bigram[0] && context->bigram[1] > bigram[1])
       {
+        if (mid == 0)
+        {
+          break;
+        }
         high = mid - 1;
       }
       else
@@ -101,11 +105,11 @@ sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
   }
   predictor->contexts = new_memory;
 
-  if (mid + 1 < predictor->contexts_size)
+  if ((mid + 1) < predictor->contexts_size)
   {
     SoothContext * src = &(predictor->contexts[mid]);
     SoothContext * dest = &(predictor->contexts[mid+1]);
-    (void)memmove(dest, src, sizeof(SoothContext) * (predictor->contexts_size - 1 - mid)); 
+    (void)memmove(dest, src, sizeof(SoothContext) * (predictor->contexts_size - mid - 1)); 
   }
 
   context = &(predictor->contexts[mid]);
@@ -140,6 +144,10 @@ sooth_predictor_find_statistic(SoothPredictor * predictor, SoothContext * contex
       }
       else if (statistic->symbol > symbol)
       {
+        if (mid == 0)
+        {
+          break;
+        }
         high = mid - 1;
       }
       else
@@ -166,11 +174,11 @@ sooth_predictor_find_statistic(SoothPredictor * predictor, SoothContext * contex
   }
   predictor->statistics = new_memory;
 
-  if (mid + 1 < predictor->statistics_size - 1)
+  if ((mid + 1) < predictor->statistics_size)
   {
     SoothStatistic * src = &(predictor->statistics[mid]);
     SoothStatistic * dest = &(predictor->statistics[mid+1]);
-    (void)memmove(dest, src, sizeof(SoothStatistic) * (predictor->statistics_size - 1 - mid)); 
+    (void)memmove(dest, src, sizeof(SoothStatistic) * (predictor->statistics_size - mid - 1)); 
   }
 
   statistic = &(predictor->statistics[mid]);
