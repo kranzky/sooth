@@ -6,15 +6,12 @@
 #include <stdint.h>
 
 #include "sooth_context.h"
-#include "sooth_statistic.h"
 
 typedef struct
 {
   uint32_t error_symbol;
   uint64_t contexts_size;
   SoothContext * contexts;
-  uint64_t statistics_size;
-  SoothStatistic * statistics;
 }
 SoothPredictor;
 

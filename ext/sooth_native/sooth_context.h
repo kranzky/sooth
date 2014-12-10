@@ -5,12 +5,14 @@
 
 #include <stdint.h>
 
+#include "sooth_statistic.h"
+
 typedef struct
 {
   uint32_t bigram[2];
   uint64_t count;
   uint32_t statistics_size;
-  uint64_t statistics_offset;
+  SoothStatistic * statistics;
 }
 SoothContext;
 

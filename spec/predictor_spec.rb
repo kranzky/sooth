@@ -60,5 +60,32 @@ describe Sooth::Predictor do
       expect(predictor.select([1,2], 0)).to eq(42)
       expect(predictor.select([1,2], 4)).to eq(42)
     end
+
+    it "selects the correct symbol with many contexts" do
+      predictor.observe([2,1], 4)
+      predictor.observe([1,3], 5)
+      predictor.observe([3,2], 6)
+      predictor.observe([1,3], 7)
+      predictor.observe([2,1], 8)
+      predictor.observe([3,2], 9)
+      predictor.observe([1,3], 1)
+      predictor.observe([2,1], 2)
+      predictor.observe([3,2], 3)
+      expect(predictor.select([2,1], 0)).to eq(42)
+      expect(predictor.select([2,1], 1)).to eq(2)
+      expect(predictor.select([2,1], 2)).to eq(4)
+      expect(predictor.select([2,1], 3)).to eq(8)
+      expect(predictor.select([2,1], 4)).to eq(42)
+      expect(predictor.select([1,3], 0)).to eq(42)
+      expect(predictor.select([1,3], 1)).to eq(1)
+      expect(predictor.select([1,3], 2)).to eq(5)
+      expect(predictor.select([1,3], 3)).to eq(7)
+      expect(predictor.select([1,3], 4)).to eq(42)
+      expect(predictor.select([3,2], 0)).to eq(42)
+      expect(predictor.select([3,2], 1)).to eq(3)
+      expect(predictor.select([3,2], 2)).to eq(6)
+      expect(predictor.select([3,2], 3)).to eq(9)
+      expect(predictor.select([3,2], 4)).to eq(42)
+    end
   end
 end
