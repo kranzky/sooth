@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "sooth"
   gem.homepage = "http://github.com/jasonhutchens/sooth"
   gem.license = "MIT"
-  gem.summary = %Q{A small thing for generating codes for users to type into places}
-  gem.description = %Q{Does what it says on the box}
+  gem.summary = %Q{Sooth is a simple stochastic predictive model.}
+  gem.description = %Q{Sooth is a simple stochastic predictive model.}
   gem.email = "jasonhutchens@gmail.com"
   gem.authors = ["Jason Hutchens"]
   gem.required_ruby_version = "~> 2.1"
