@@ -1,0 +1,13 @@
+overage
+coverage.data
+rdoc
+doc
+.yardoc
+.bundle
+pkg
+*.swp
+.rvmrc
+.ruby-version
+.ruby-gemset
+.ditz-config
+tmp
