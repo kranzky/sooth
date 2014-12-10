@@ -76,11 +76,11 @@ sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
     {
       mid = low + (high - low) / 2;
       context = &(predictor->contexts[mid]);
-      if (context->bigram[0] < bigram[0] || context->bigram[0] == bigram[0] && context->bigram[1] < bigram[1])
+      if (context->bigram[0] < bigram[0] || (context->bigram[0] == bigram[0] && context->bigram[1] < bigram[1]))
       {
         low = mid + 1;
       }
-      else if (context->bigram[0] > bigram[0] || context->bigram[0] == bigram[0] && context->bigram[1] > bigram[1])
+      else if (context->bigram[0] > bigram[0] || (context->bigram[0] == bigram[0] && context->bigram[1] > bigram[1]))
       {
         if (mid == 0)
         {
