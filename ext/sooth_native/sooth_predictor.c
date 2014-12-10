@@ -227,7 +227,7 @@ sooth_predictor_select(SoothPredictor * predictor, uint32_t bigram[2], uint64_t 
 {
   SoothContext * context = sooth_predictor_find_context(predictor, bigram);
 
-  if (context == NULL)
+  if (context == NULL || limit == 0)
   {
     return predictor->error_symbol;
   }
