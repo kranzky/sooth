@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.authors = ["Jason Hutchens"]
   s.date = "2014-12-10"
-  s.description = "Does what it says on the box"
+  s.description = "Sooth is a simple stochastic predictive model."
   s.email = "jasonhutchens@gmail.com"
   s.extensions = ["ext/sooth_native/extconf.rb"]
   s.extra_rdoc_files = [
@@ -39,10 +39,10 @@ Gem::Specification.new do |s|
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/jasonhutchens/sooth"
-  s.licenses = ["MIT"]
+  s.licenses = ["UNLICENSE"]
   s.required_ruby_version = Gem::Requirement.new("~> 2.1")
   s.rubygems_version = "2.4.4"
-  s.summary = "A small thing for generating codes for users to type into places"
+  s.summary = "Sooth is a simple stochastic predictive model."
 
   if s.respond_to? :specification_version then
     s.specification_version = 4

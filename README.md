@@ -13,15 +13,6 @@ Getting Started
 
 Apart from the specs, look at the [API docs](http://rubydoc.info/github/jasonhutchens/sooth/master/frames) to get up to speed.
 
-Next
-----
-
-* Implement save and load (with specs)
-* Version 0.9
-* Hook up to all services
-* Version 1
-* MegaHAL that uses it
-
 Copyright
 ---------
 

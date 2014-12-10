@@ -16,7 +16,7 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://guides.rubygems.org/specification-reference/ for more options
   gem.name = "sooth"
   gem.homepage = "http://github.com/jasonhutchens/sooth"
-  gem.license = "MIT"
+  gem.license = "UNLICENSE"
   gem.summary = %Q{Sooth is a simple stochastic predictive model.}
   gem.description = %Q{Sooth is a simple stochastic predictive model.}
   gem.email = "jasonhutchens@gmail.com"
