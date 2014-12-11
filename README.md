@@ -5,7 +5,8 @@
 Sooth
 =====
 
-Sooth is a simple stochastic predictive model. It is used by [MegaHAL](https://github.com/jasonhutchens/megahal).
+Sooth is a simple stochastic predictive model. It is used by
+[MegaHAL](https://github.com/jasonhutchens/megahal), a learning chatterbot.
 
 Getting Started
 ---------------

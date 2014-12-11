@@ -20,6 +20,12 @@ void method_sooth_native_deallocate(void * predictor);
  *     class Predictor
  *       def initialize(error_symbol)
  *       end
+ *       def clear
+ *       end
+ *       def load(filename)
+ *       end
+ *       def save(filename)
+ *       end
  *       def observe(bigram, symbol)
  *         # (native code)
  *       end
@@ -38,6 +44,26 @@ void method_sooth_native_deallocate(void * predictor);
  *                              prediction can be made.
  */
 VALUE method_sooth_native_initialize(VALUE self, VALUE error_symbol);
+
+/*
+ * Clear the predictor to a fresh slate.
+ */
+VALUE method_sooth_native_clear(VALUE self);
+
+/*
+ * Load the predictor from the specified filename. The predictor will be cleared
+ * before the file is loaded.
+ *
+ * @param [String] filename The path of the file to be loaded.
+ */
+VALUE method_sooth_native_load(VALUE self, VALUE filename);
+
+/*
+ * Save the predictor to a file that can be loaded or merged later.
+ *
+ * @param [String] filename The path of the file to be merge.
+ */
+VALUE method_sooth_native_save(VALUE self, VALUE filename);
 
 /*
  * Add an observation of the given symbol in the context of the bigram.
@@ -90,6 +116,10 @@ void Init_sooth_native()
   rb_define_alloc_func(SoothNative, method_sooth_native_allocate);
   rb_define_method(SoothNative, "initialize", method_sooth_native_initialize, 1);
 
+  rb_define_method(SoothNative, "clear", method_sooth_native_clear, 0);
+  rb_define_method(SoothNative, "load", method_sooth_native_load, 1);
+  rb_define_method(SoothNative, "save", method_sooth_native_save, 1);
+
   rb_define_method(SoothNative, "observe", method_sooth_native_observe, 2);
   rb_define_method(SoothNative, "count", method_sooth_native_count, 1);
   rb_define_method(SoothNative, "select", method_sooth_native_select, 2);
@@ -126,6 +156,33 @@ method_sooth_native_initialize(VALUE self, VALUE error_symbol)
   Data_Get_Struct(self, SoothPredictor, predictor);
   predictor->error_symbol = NUM2UINT(error_symbol);
   return self;
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_clear(VALUE self)
+{
+  SoothPredictor * predictor = NULL;
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  sooth_predictor_clear(predictor);
+  return Qnil;
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_load(VALUE self, VALUE filename)
+{
+  return Qnil;
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_save(VALUE self, VALUE filename)
+{
+  return Qnil;
 }
 
 //------------------------------------------------------------------------------

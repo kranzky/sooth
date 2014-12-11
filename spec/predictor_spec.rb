@@ -88,4 +88,18 @@ describe Sooth::Predictor do
       expect(predictor.select([3,2], 4)).to eq(42)
     end
   end
+
+  describe "#clear" do
+
+    it "clears to a blank slate" do
+      expect(predictor.observe([1,2], 3)).to eq(1)
+      expect(predictor.observe([1,2], 3)).to eq(2)
+      expect(predictor.observe([1,2], 3)).to eq(3)
+      predictor.clear
+      expect(predictor.observe([1,2], 3)).to eq(1)
+      expect(predictor.observe([1,2], 3)).to eq(2)
+      expect(predictor.observe([1,2], 3)).to eq(3)
+    end
+
+  end
 end

@@ -18,7 +18,6 @@ sooth_predictor_init()
   }
 
   predictor->error_symbol = 0;
-
   predictor->contexts = NULL;
   predictor->contexts_size = 0;
 
@@ -28,7 +27,7 @@ sooth_predictor_init()
 //------------------------------------------------------------------------------
 
 void
-sooth_predictor_free(SoothPredictor * predictor)
+sooth_predictor_clear(SoothPredictor * predictor)
 {
   for (uint64_t i = 0; i < predictor->contexts_size; ++i)
   {
@@ -41,7 +40,14 @@ sooth_predictor_free(SoothPredictor * predictor)
   free(predictor->contexts);
   predictor->contexts = NULL;
   predictor->contexts_size = 0;
+}
 
+//------------------------------------------------------------------------------
+
+void
+sooth_predictor_free(SoothPredictor * predictor)
+{
+  sooth_predictor_clear(predictor);
   free(predictor);
 }
 
@@ -54,10 +60,15 @@ sooth_predictor_save(const char * const filename, SoothPredictor * predictor)
 
 //------------------------------------------------------------------------------
 
-SoothPredictor *
-sooth_predictor_load(const char * const filename)
+void sooth_predictor_merge(const char * const filename, SoothPredictor * predictor)
 {
-  return NULL;
+}
+//------------------------------------------------------------------------------
+
+void sooth_predictor_load(const char * const filename, SoothPredictor * predictor)
+{
+  sooth_predictor_clear(predictor);
+  sooth_predictor_merge(predictor, filename);
 }
 
 //------------------------------------------------------------------------------
