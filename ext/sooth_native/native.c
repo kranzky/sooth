@@ -220,7 +220,7 @@ method_sooth_native_count(VALUE self, VALUE bigram)
   Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
   uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
-  uint64_t count = sooth_predictor_count(predictor, c_bigram);
+  uint32_t count = sooth_predictor_count(predictor, c_bigram);
   return UINT2NUM(count);
 }
 

@@ -10,7 +10,7 @@
 typedef struct
 {
   uint32_t bigram[2];
-  uint64_t count;
+  uint32_t count;
   uint32_t statistics_size;
   SoothStatistic * statistics;
 }
