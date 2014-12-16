@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "sooth_predictor.h"
 
@@ -335,6 +336,54 @@ sooth_predictor_select(SoothPredictor * predictor, uint32_t bigram[2], uint32_t 
   }
 
   return predictor->error_symbol;
+}
+
+//------------------------------------------------------------------------------
+
+double
+sooth_predictor_uncertainty(SoothPredictor * predictor, uint32_t bigram[2])
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
+
+  if (context == NULL || context->count == 0)
+  {
+    return -1;
+  }
+
+  double uncertainty = 0.0;
+  for (uint32_t i = 0; i < context->statistics_size; ++i)
+  {
+    if (context->statistics[i].count > 0)
+    {
+      double frequency = (double)context->statistics[i].count / (double)context->count;
+      uncertainty -= frequency * log2(frequency);
+    }
+  }
+
+  return uncertainty;
+}
+
+//------------------------------------------------------------------------------
+
+double
+sooth_predictor_surprise(SoothPredictor * predictor, uint32_t bigram[2], uint32_t symbol)
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
+
+  if (context == NULL || context->count == 0)
+  {
+    return -1;
+  }
+
+  SoothStatistic * statistic = sooth_predictor_find_statistic(context, symbol);
+
+  if (statistic == NULL || statistic->count == 0)
+  {
+    return -1;
+  }
+
+  double frequency = (double)statistic->count / (double)context->count;
+  return -log2(frequency);
 }
 
 //==============================================================================

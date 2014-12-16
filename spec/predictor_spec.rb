@@ -134,4 +134,45 @@ describe Sooth::Predictor do
     end
 
   end
+
+  describe "#uncertainty" do
+
+    it "has no uncertainty for a new context" do
+      expect(predictor.uncertainty([1, 2])).to be_nil 
+      expect(predictor.count([1, 2])).to eq(0) 
+      expect(predictor.uncertainty([1, 2])).to be_nil 
+    end
+
+    it "has zero uncertainty for a lone context" do
+      predictor.observe([1, 2], 3)
+      expect(predictor.uncertainty([1, 2])).to eq(0) 
+    end
+
+    it "has maximal uncertainty for a uniform distribution" do
+      (1..256).each { |i| predictor.observe([1, 2], i) }
+      expect(predictor.uncertainty([1, 2])).to eq(8) 
+    end
+
+  end
+
+  describe "#surprise" do
+
+    it "has no surprise for a new context or symbol" do
+      expect(predictor.surprise([1, 2], 3)).to be_nil 
+      expect(predictor.count([1, 2])).to eq(0) 
+      expect(predictor.surprise([1, 2], 3)).to be_nil 
+    end
+
+    it "has zero surprise for a lone context" do
+      predictor.observe([1, 2], 3)
+      expect(predictor.surprise([1, 2], 3)).to eq(0) 
+    end
+
+    it "has uniform surprise for a uniform distribution" do
+      (1..256).each { |i| predictor.observe([1, 2], i) }
+      expect(predictor.surprise([1, 2], 3)).to eq(8) 
+    end
+
+  end
+
 end

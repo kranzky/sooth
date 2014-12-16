@@ -35,6 +35,12 @@ void method_sooth_native_deallocate(void * predictor);
  *       def select(bigram, limit)
  *         # (native code)
  *       end
+ *       def uncertainty(bigram)
+ *         # (native code)
+ *       end
+ *       def surprise(bigram, symbol)
+ *         # (native code)
+ *       end
  *     end
  *   end
  *
@@ -106,6 +112,32 @@ VALUE method_sooth_native_count(VALUE self, VALUE bigram);
  */
 VALUE method_sooth_native_select(VALUE self, VALUE bigram, VALUE limit);
 
+/*
+ * Return a number indicating how uncertain the predictor is about which symbol
+ * is likely to be observed after the given bigram. Note that nil will be
+ * returned if the bigram has never been observed.
+ *
+ * @param [Array] bigram A pair of symbols.
+ * @return [Float] The uncertainty, which is calculated to be the shannon entropy
+ *                 of the probability distribution over the alphabet of symbols
+ *                 in the context of the bigram.
+ */
+VALUE method_sooth_native_uncertainty(VALUE self, VALUE bigram);
+
+/*
+ * Return a number indicating the surprise received by the predictor when it
+ * observed the given symbol after the given bigram. Note that nil will be
+ * returned if the symbol has never been observed after the bigram.
+ *
+ * @param [Array] bigram A pair of symbols.
+ * @param [Fixnum] symbol The symbol that has been observed.
+ * @return [Float] The surprise, which is calculated to be the shannon pointwise
+ *                 mutual information of the symbol according to the probability
+ *                 distribution over the alphabet of symbols in the context of
+ *                 the bigram.
+ */
+VALUE method_sooth_native_surprise(VALUE self, VALUE bigram, VALUE limit);
+
 //------------------------------------------------------------------------------
 
 void Init_sooth_native()
@@ -123,6 +155,8 @@ void Init_sooth_native()
   rb_define_method(SoothNative, "observe", method_sooth_native_observe, 2);
   rb_define_method(SoothNative, "count", method_sooth_native_count, 1);
   rb_define_method(SoothNative, "select", method_sooth_native_select, 2);
+  rb_define_method(SoothNative, "uncertainty", method_sooth_native_uncertainty, 1);
+  rb_define_method(SoothNative, "surprise", method_sooth_native_surprise, 2);
 }
 
 //------------------------------------------------------------------------------
@@ -256,6 +290,53 @@ method_sooth_native_select(VALUE self, VALUE bigram, VALUE limit)
   uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
   uint32_t symbol = sooth_predictor_select(predictor, c_bigram, NUM2UINT(limit));
   return UINT2NUM(symbol);
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_uncertainty(VALUE self, VALUE bigram)
+{
+  SoothPredictor * predictor = NULL;
+  Check_Type(bigram, T_ARRAY);
+  if (RARRAY_LEN(bigram) != 2)
+  {
+    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
+  }
+  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
+  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
+  double uncertainty = sooth_predictor_uncertainty(predictor, c_bigram);
+  if (uncertainty < 0)
+  {
+    return Qnil;
+  }
+  return DBL2NUM(uncertainty);
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_surprise(VALUE self, VALUE bigram, VALUE symbol)
+{
+  SoothPredictor * predictor = NULL;
+  Check_Type(symbol, T_FIXNUM);
+  Check_Type(bigram, T_ARRAY);
+  if (RARRAY_LEN(bigram) != 2)
+  {
+    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
+  }
+  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
+  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
+  double surprise = sooth_predictor_surprise(predictor, c_bigram, NUM2UINT(symbol));
+  if (surprise < 0)
+  {
+    return Qnil;
+  }
+  return DBL2NUM(surprise);
 }
 
 //==============================================================================
