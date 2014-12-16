@@ -174,6 +174,13 @@ method_sooth_native_clear(VALUE self)
 VALUE
 method_sooth_native_load(VALUE self, VALUE filename)
 {
+  SoothPredictor * predictor = NULL;
+  Check_Type(filename, T_STRING);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  if (!sooth_predictor_load(RSTRING_PTR(filename), predictor))
+  {
+    rb_raise(rb_eIOError, "problem loading predictor");
+  }
   return Qnil;
 }
 
@@ -182,6 +189,13 @@ method_sooth_native_load(VALUE self, VALUE filename)
 VALUE
 method_sooth_native_save(VALUE self, VALUE filename)
 {
+  SoothPredictor * predictor = NULL;
+  Check_Type(filename, T_STRING);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  if (!sooth_predictor_save(RSTRING_PTR(filename), predictor))
+  {
+    rb_raise(rb_eIOError, "problem saving predictor");
+  }
   return Qnil;
 }
 

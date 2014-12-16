@@ -1,9 +1,28 @@
 //==============================================================================
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "sooth_predictor.h"
+
+//------------------------------------------------------------------------------
+
+void
+sooth_show_predictor(SoothPredictor * predictor)
+{
+  printf("Error Symbol: %u\n", predictor->error_symbol);
+  for (uint32_t i = 0; i < predictor->contexts_size; ++i)
+  {
+    SoothContext context = predictor->contexts[i];
+    printf("  Context %u-%u (%u)\n", context.bigram[0], context.bigram[1], context.count);
+    for (uint32_t j = 0; j < context.statistics_size; ++j)
+    {
+      SoothStatistic statistic = context.statistics[j];
+      printf("    Symbol %u (%u)\n", statistic.symbol, statistic.count);
+    }
+  }
+}
 
 //------------------------------------------------------------------------------
 
@@ -53,18 +72,81 @@ sooth_predictor_free(SoothPredictor * predictor)
 
 //------------------------------------------------------------------------------
 
-void
+bool
 sooth_predictor_save(const char * const filename, SoothPredictor * predictor)
 {
-  // TODO
+  FILE *file = fopen(filename, "wb");
+
+  if (file == NULL)
+  {
+    return false;
+  }
+
+  fwrite("MH10", 1, 4, file);
+  fwrite(&predictor->error_symbol, 4, 1, file);
+  fwrite(&predictor->contexts_size, 4, 1, file);
+  for (uint32_t i = 0; i < predictor->contexts_size; ++i)
+  {
+    SoothContext context = predictor->contexts[i];
+    fwrite(context.bigram, 4, 2, file);
+    fwrite(&context.count, 4, 1, file);
+    fwrite(&context.statistics_size, 4, 1, file);
+    fwrite(context.statistics, sizeof(SoothStatistic), context.statistics_size, file);
+  }
+
+  fclose(file);
+
+  return true;
 }
 
 //------------------------------------------------------------------------------
 
-void sooth_predictor_load(const char * const filename, SoothPredictor * predictor)
+bool sooth_predictor_load(const char * const filename, SoothPredictor * predictor)
 {
+  FILE *file = fopen(filename, "rb");
+
+  if (file == NULL)
+  {
+    return false;
+  }
+
+  char code[4];
+  fread(code, 1, 4, file);
+  if (strncmp(code, "MH10", 4) != 0)
+  {
+    return false;
+  }
+
   sooth_predictor_clear(predictor);
-  // TODO
+
+  fread(&predictor->error_symbol, 4, 1, file);
+  fread(&predictor->contexts_size, 4, 1, file);
+  if (predictor->contexts_size == 0)
+  {
+    return true;
+  }
+  predictor->contexts = malloc(sizeof(SoothContext) * predictor->contexts_size);
+  if (predictor->contexts == NULL)
+  {
+    sooth_predictor_clear(predictor);
+    return NULL;
+  }
+  for (uint32_t i = 0; i < predictor->contexts_size; ++i)
+  {
+    SoothContext * context = &(predictor->contexts[i]);
+    fread(context->bigram, 4, 2, file);
+    fread(&context->count, 4, 1, file);
+    fread(&context->statistics_size, 4, 1, file);
+    context->statistics = malloc(sizeof(SoothStatistic) * context->statistics_size);
+    if (context->statistics == NULL)
+    {
+      sooth_predictor_clear(predictor);
+      return NULL;
+    }
+    fread(context->statistics, sizeof(SoothStatistic), context->statistics_size, file);
+  }
+
+  return true;
 }
 
 //------------------------------------------------------------------------------

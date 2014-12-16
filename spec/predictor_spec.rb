@@ -1,3 +1,5 @@
+require 'tempfile'
+
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Sooth::Predictor do
@@ -99,6 +101,36 @@ describe Sooth::Predictor do
       expect(predictor.observe([1,2], 3)).to eq(1)
       expect(predictor.observe([1,2], 3)).to eq(2)
       expect(predictor.observe([1,2], 3)).to eq(3)
+    end
+
+  end
+
+  describe "#save" do
+
+    it "can save a file and load it back again" do
+      begin
+        file = Tempfile.new('sooth_spec')
+        expect(predictor.observe([1,2], 3)).to eq(1)
+        expect(predictor.observe([2,1], 3)).to eq(1)
+        expect(predictor.observe([1,2], 3)).to eq(2)
+        expect(predictor.observe([1,2], 3)).to eq(3)
+        expect { predictor.save(file.path) } .to_not raise_error
+        expect(predictor.count([1,2])).to eq(3)
+        expect(predictor.count([2,1])).to eq(1)
+        predictor.clear
+        expect(predictor.count([1,2])).to eq(0)
+        expect(predictor.count([2,1])).to eq(0)
+        expect { predictor.load(file.path) }.to_not raise_error
+        expect(predictor.count([1,2])).to eq(3)
+        expect(predictor.count([2,1])).to eq(1)
+        expect(predictor.observe([1,2], 3)).to eq(4)
+        expect(predictor.observe([1,2], 1)).to eq(1)
+        expect(predictor.observe([2,1], 3)).to eq(2)
+        expect(predictor.observe([2,1], 1)).to eq(1)
+      ensure
+        file.close
+        file.unlink
+      end
     end
 
   end
