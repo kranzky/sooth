@@ -12,7 +12,7 @@ Sooth is a simple stochastic predictive model. It is used by
 Getting Started
 ---------------
 
-Apart from the specs, look at the [API docs](http://rubydoc.info/github/jasonhutchens/sooth/master/frames) to get up to speed.
+Apart from the specs, look at the [API docs](http://www.rubydoc.info/gems/sooth/) to get up to speed.
 
 Copyright
 ---------
