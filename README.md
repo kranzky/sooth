@@ -17,4 +17,4 @@ Apart from the specs, look at the [API docs](http://www.rubydoc.info/gems/sooth/
 Copyright
 ---------
 
-Copyright (c) 2014 Jason Hutchens. See UNLICENSE for further details.
+Copyright (c) 2015 Jason Hutchens. See UNLICENSE for further details.
