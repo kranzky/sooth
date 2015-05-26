@@ -17,9 +17,11 @@ Gem::Specification.new do |s|
   s.email = "jasonhutchens@gmail.com"
   s.extensions = ["ext/sooth_native/extconf.rb"]
   s.extra_rdoc_files = [
+    "CHANGELOG.md",
     "README.md"
   ]
   s.files = [
+    "CHANGELOG.md",
     "Gemfile",
     "Gemfile.lock",
     "README.md",
