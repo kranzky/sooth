@@ -14,11 +14,10 @@ void method_sooth_native_deallocate(void * predictor);
 
 /* @!parse [ruby]
  *   module Sooth
- *     # A very simple stochastic predictor. Implemented in C for efficiency.
- *     # The idea here is to build up more complicated learning algorithms using
- *     # a trivial Markovian predictor.
+ *     # A minimal stochastic predictive model, implemented in C for efficiency.
+ *     # No assumptions about PRNG or real-world significance of context/event.
  *     class Predictor
- *       def initialize(error_symbol)
+ *       def initialize(error_event)
  *       end
  *       def clear
  *       end
@@ -26,19 +25,25 @@ void method_sooth_native_deallocate(void * predictor);
  *       end
  *       def save(filename)
  *       end
- *       def observe(bigram, symbol)
+ *       def size(context)
  *         # (native code)
  *       end
- *       def count(bigram)
+ *       def count(context)
  *         # (native code)
  *       end
- *       def select(bigram, limit)
+ *       def observe(context, event)
  *         # (native code)
  *       end
- *       def uncertainty(bigram)
+ *       def select(context, limit)
  *         # (native code)
  *       end
- *       def surprise(bigram, symbol)
+ *       def distribution(context)
+ *         # (native code)
+ *       end
+ *       def uncertainty(context)
+ *         # (native code)
+ *       end
+ *       def surprise(context, evemt)
  *         # (native code)
  *       end
  *     end
@@ -46,13 +51,13 @@ void method_sooth_native_deallocate(void * predictor);
  *
  * Returns a new Sooth::Predictor instance.
  *
- * @param [Fixnum] error_symbol The symbol to be returned by #select when no
- *                              prediction can be made.
+ * @param [Fixnum] error_event The event to be returned by #select when no
+ *                             observations have been made for the context.
  */
-VALUE method_sooth_native_initialize(VALUE self, VALUE error_symbol);
+VALUE method_sooth_native_initialize(VALUE self, VALUE error_event);
 
 /*
- * Clear the predictor to a fresh slate.
+ * Clear the predictor to a blank slate.
  */
 VALUE method_sooth_native_clear(VALUE self);
 
@@ -65,76 +70,92 @@ VALUE method_sooth_native_clear(VALUE self);
 VALUE method_sooth_native_load(VALUE self, VALUE filename);
 
 /*
- * Save the predictor to a file that can be loaded or merged later.
+ * Save the predictor to a file that can be loaded later.
  *
  * @param [String] filename The path of the file to be merge.
  */
 VALUE method_sooth_native_save(VALUE self, VALUE filename);
 
 /*
- * Add an observation of the given symbol in the context of the bigram.
+ * Return the number of different events that have been observed within the
+ * given context.
  *
- * @param [Array] bigram A pair of symbols that provide context, allowing the
- *                       predictor to maintain observation statistics for
- *                       different contexts.
- * @param [Fixnum] symbol The symbol that has been observed.
- * @return [Fixnum] A count of the number of times the symbol has been
- *                  observed in the context of the bigram.
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @return [Fixnum] The number of distinct events that have been observed
+ *                  within the given context. This is guaranteed to be equal
+ *                  to the length of the #distribution for the context.
  */
-VALUE method_sooth_native_observe(VALUE self, VALUE bigram, VALUE symbol);
+
+VALUE method_sooth_native_size(VALUE self, VALUE context);
 
 /*
- * Return a count of the number of times the bigram has been observed.
+ * Return the number of times the context has been observed.
  *
- * @param [Array] bigram A pair of symbols.
- * @return [Fixnum] A count of the number of times the bigram has been
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @return [Fixnum] A count of the number of times the context has been
  *                  observed. This is guaranteed to be equal to the sum
- *                  of the counts of observations of all symbols in the
- *                  context of the bigram.
+ *                  of the counts of observations of all events observed in
+ *                  the context.
  */
-VALUE method_sooth_native_count(VALUE self, VALUE bigram);
+VALUE method_sooth_native_count(VALUE self, VALUE context);
 
 /*
- * Return a symbol that may occur in the context of the bigram. The
- * limit is used to select a symbol. This is done by iterating through
- * all of the symbols that have been observed in the context of the
- * bigram, subtracting the observation count of each symbol from the
- * supplied limit. For this reason, limit should be between 1 and the
- * observation count of the bigram itself, as returned by #count.
+ * Register an observation of the given event within the given context.
  *
- * @param [Array] bigram A pair of symbols.
- * @param [Fixnum] limit The total numbe of symbol observations to be
- *                       analysed before returning a symbol.
- * @return [Fixnum] A symbol that has been observed previously in the
- *                  context of the bigram, or the error_symbol if no
- *                  such symbol exists, or if the supplied limit was
- *                  too large.
+ * @param [Fixnum] context A number that provides a context for the event,
+ *                         allowing the predictor to maintain observation
+ *                         statistics for different contexts.
+ * @param [Fixnum] event A number representing the observed event.
+ * @return [Fixnum] A count of the number of times the event has been
+ *                  observed in the given context.
  */
-VALUE method_sooth_native_select(VALUE self, VALUE bigram, VALUE limit);
+VALUE method_sooth_native_observe(VALUE self, VALUE context, VALUE event);
 
 /*
- * Return a number indicating how uncertain the predictor is about which symbol
- * is likely to be observed after the given bigram. Note that nil will be
- * returned if the bigram has never been observed.
+ * Return an event that may occur in the given context, based on the limit,
+ * which should be between 1 and #count. The event is selected by iterating
+ * through all observed events for the context, subtracting the observation
+ * count of each event from the limit until it is zero or less.
  *
- * @param [Array] bigram A pair of symbols.
- * @return [Float] The uncertainty, which is calculated to be the shannon entropy
- *                 of the probability distribution over the alphabet of symbols
- *                 in the context of the bigram.
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @param [Fixnum] limit The total number of event observations to be
+ *                       analysed before returning a event.
+ * @return [Fixnum] An event that has been previously observed in the given
+ *                  context, or the error_event if the #count of the context
+ *                  is zero, or if limit exceeds the #count of the context
  */
-VALUE method_sooth_native_uncertainty(VALUE self, VALUE bigram);
+VALUE method_sooth_native_select(VALUE self, VALUE context, VALUE limit);
+
+/*
+ * Return an Enumerator that yields each observed event within the context
+ * together with its probability.
+ *
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @return [Array] A list of event-probability pairs.
+ */
+VALUE method_sooth_native_distribution(VALUE self, VALUE context);
+
+/*
+ * Return a number indicating how uncertain the predictor is about which event
+ * is likely to be observed after the given context. Note that nil will be
+ * returned if the context has never been observed.
+ *
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @return [Float] The uncertainty, which is calculated to be the Shannon entropy
+ *                 of the #distribution over the context.
+ */
+VALUE method_sooth_native_uncertainty(VALUE self, VALUE context);
 
 /*
  * Return a number indicating the surprise received by the predictor when it
- * observed the given symbol after the given bigram. Note that nil will be
- * returned if the symbol has never been observed after the bigram.
+ * observed the given event within the given context. Note that nil will be
+ * returned if the event has never been observed within the context.
  *
- * @param [Array] bigram A pair of symbols.
- * @param [Fixnum] symbol The symbol that has been observed.
- * @return [Float] The surprise, which is calculated to be the shannon pointwise
- *                 mutual information of the symbol according to the probability
- *                 distribution over the alphabet of symbols in the context of
- *                 the bigram.
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @param [Fixnum] event A number representing the observed event.
+ * @return [Float] The surprise, which is calculated to be the Shannon pointwise
+ *                 mutual information of the event according to the
+ *                 #distribution over the context.
  */
 VALUE method_sooth_native_surprise(VALUE self, VALUE bigram, VALUE limit);
 
@@ -152,9 +173,12 @@ void Init_sooth_native()
   rb_define_method(SoothNative, "load", method_sooth_native_load, 1);
   rb_define_method(SoothNative, "save", method_sooth_native_save, 1);
 
-  rb_define_method(SoothNative, "observe", method_sooth_native_observe, 2);
+  rb_define_method(SoothNative, "size", method_sooth_native_size, 1);
   rb_define_method(SoothNative, "count", method_sooth_native_count, 1);
+  rb_define_method(SoothNative, "observe", method_sooth_native_observe, 2);
   rb_define_method(SoothNative, "select", method_sooth_native_select, 2);
+
+  rb_define_method(SoothNative, "distribution", method_sooth_native_distribution, 1);
   rb_define_method(SoothNative, "uncertainty", method_sooth_native_uncertainty, 1);
   rb_define_method(SoothNative, "surprise", method_sooth_native_surprise, 2);
 }
@@ -183,12 +207,12 @@ method_sooth_native_deallocate(void * predictor)
 //------------------------------------------------------------------------------
 
 VALUE
-method_sooth_native_initialize(VALUE self, VALUE error_symbol)
+method_sooth_native_initialize(VALUE self, VALUE error_event)
 {
   SoothPredictor * predictor = NULL;
-  Check_Type(error_symbol, T_FIXNUM);
+  Check_Type(error_event, T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
-  predictor->error_symbol = NUM2UINT(error_symbol);
+  predictor->error_event = NUM2UINT(error_event);
   return self;
 }
 
@@ -236,78 +260,90 @@ method_sooth_native_save(VALUE self, VALUE filename)
 //------------------------------------------------------------------------------
 
 VALUE
-method_sooth_native_observe(VALUE self, VALUE bigram, VALUE symbol)
+method_sooth_native_size(VALUE self, VALUE context)
 {
   SoothPredictor * predictor = NULL;
-  Check_Type(symbol, T_FIXNUM);
-  Check_Type(bigram, T_ARRAY);
-  if (RARRAY_LEN(bigram) != 2)
-  {
-    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
-  }
-  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
-  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
+  Check_Type(context, T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
-  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
-  uint32_t count = sooth_predictor_observe(predictor, c_bigram, NUM2UINT(symbol));
+  uint32_t size = sooth_predictor_size(predictor, NUM2UINT(context));
+  return UINT2NUM(size);
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_count(VALUE self, VALUE context)
+{
+  SoothPredictor * predictor = NULL;
+  Check_Type(context, T_FIXNUM);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  uint32_t count = sooth_predictor_count(predictor, NUM2UINT(context));
   return UINT2NUM(count);
 }
 
 //------------------------------------------------------------------------------
 
 VALUE
-method_sooth_native_count(VALUE self, VALUE bigram)
+method_sooth_native_observe(VALUE self, VALUE context, VALUE event)
 {
   SoothPredictor * predictor = NULL;
-  Check_Type(bigram, T_ARRAY);
-  if (RARRAY_LEN(bigram) != 2)
-  {
-    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
-  }
-  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
-  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
+  Check_Type(context, T_FIXNUM);
+  Check_Type(event, T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
-  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
-  uint32_t count = sooth_predictor_count(predictor, c_bigram);
+  uint32_t count = sooth_predictor_observe(predictor, NUM2UINT(context), NUM2UINT(event));
   return UINT2NUM(count);
 }
 
 //------------------------------------------------------------------------------
 
 VALUE
-method_sooth_native_select(VALUE self, VALUE bigram, VALUE limit)
+method_sooth_native_select(VALUE self, VALUE context, VALUE limit)
 {
   SoothPredictor * predictor = NULL;
+  Check_Type(context, T_FIXNUM);
   Check_Type(limit, T_FIXNUM);
-  Check_Type(bigram, T_ARRAY);
-  if (RARRAY_LEN(bigram) != 2)
-  {
-    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
-  }
-  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
-  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
-  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
-  uint32_t symbol = sooth_predictor_select(predictor, c_bigram, NUM2UINT(limit));
-  return UINT2NUM(symbol);
+  uint32_t event = sooth_predictor_select(predictor, NUM2UINT(context), NUM2UINT(limit));
+  return UINT2NUM(event);
 }
 
 //------------------------------------------------------------------------------
 
 VALUE
-method_sooth_native_uncertainty(VALUE self, VALUE bigram)
+method_sooth_native_distribution(VALUE self, VALUE context)
 {
   SoothPredictor * predictor = NULL;
-  Check_Type(bigram, T_ARRAY);
-  if (RARRAY_LEN(bigram) != 2)
-  {
-    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
-  }
-  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
-  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
+  Check_Type(context, T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
-  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
-  double uncertainty = sooth_predictor_uncertainty(predictor, c_bigram);
+  uint32_t c_context = NUM2UINT(context);
+  SoothStatistic * statistics = sooth_predictor_distribution(predictor, c_context);
+  if (statistics == NULL)
+  {
+    return Qnil;
+  }
+  uint32_t size = sooth_predictor_size(predictor, c_context);
+  double count = (double)sooth_predictor_count(predictor, c_context);
+  VALUE r_array = rb_ary_new2(size);
+  for (uint32_t i = 0; i < size; ++i)
+  {
+    SoothStatistic statistic = statistics[i];
+    VALUE pair = rb_ary_new2(2);
+    rb_ary_store(pair, 0, UINT2NUM(statistic.event));
+    rb_ary_store(pair, 1, DBL2NUM((double)statistic.count/count));
+    rb_ary_store(r_array, i, pair);
+  }
+  return r_array;
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_uncertainty(VALUE self, VALUE context)
+{
+  SoothPredictor * predictor = NULL;
+  Check_Type(context, T_FIXNUM);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  double uncertainty = sooth_predictor_uncertainty(predictor, NUM2UINT(context));
   if (uncertainty < 0)
   {
     return Qnil;
@@ -318,20 +354,13 @@ method_sooth_native_uncertainty(VALUE self, VALUE bigram)
 //------------------------------------------------------------------------------
 
 VALUE
-method_sooth_native_surprise(VALUE self, VALUE bigram, VALUE symbol)
+method_sooth_native_surprise(VALUE self, VALUE context, VALUE event)
 {
   SoothPredictor * predictor = NULL;
-  Check_Type(symbol, T_FIXNUM);
-  Check_Type(bigram, T_ARRAY);
-  if (RARRAY_LEN(bigram) != 2)
-  {
-    rb_raise(rb_eTypeError, "bigram must be an array of exactly two symbols");
-  }
-  Check_Type(RARRAY_PTR(bigram)[0], T_FIXNUM);
-  Check_Type(RARRAY_PTR(bigram)[1], T_FIXNUM);
+  Check_Type(context, T_FIXNUM);
+  Check_Type(event, T_FIXNUM);
   Data_Get_Struct(self, SoothPredictor, predictor);
-  uint32_t c_bigram[2] = {NUM2UINT(RARRAY_PTR(bigram)[0]), NUM2UINT(RARRAY_PTR(bigram)[1])};
-  double surprise = sooth_predictor_surprise(predictor, c_bigram, NUM2UINT(symbol));
+  double surprise = sooth_predictor_surprise(predictor, NUM2UINT(context), NUM2UINT(event));
   if (surprise < 0)
   {
     return Qnil;

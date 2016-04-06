@@ -9,24 +9,6 @@
 
 //------------------------------------------------------------------------------
 
-void
-sooth_show_predictor(SoothPredictor * predictor)
-{
-  printf("Error Symbol: %u\n", predictor->error_symbol);
-  for (uint32_t i = 0; i < predictor->contexts_size; ++i)
-  {
-    SoothContext context = predictor->contexts[i];
-    printf("  Context %u-%u (%u)\n", context.bigram[0], context.bigram[1], context.count);
-    for (uint32_t j = 0; j < context.statistics_size; ++j)
-    {
-      SoothStatistic statistic = context.statistics[j];
-      printf("    Symbol %u (%u)\n", statistic.symbol, statistic.count);
-    }
-  }
-}
-
-//------------------------------------------------------------------------------
-
 SoothPredictor *
 sooth_predictor_init()
 {
@@ -37,7 +19,7 @@ sooth_predictor_init()
     return NULL;
   }
 
-  predictor->error_symbol = 0;
+  predictor->error_event = 0;
   predictor->contexts = NULL;
   predictor->contexts_size = 0;
 
@@ -53,8 +35,6 @@ sooth_predictor_clear(SoothPredictor * predictor)
   {
     SoothContext * context = &(predictor->contexts[i]);
     free(context->statistics);
-    context->statistics = NULL;
-    context->statistics_size = 0;
   }
 
   free(predictor->contexts);
@@ -83,13 +63,13 @@ sooth_predictor_save(const char * const filename, SoothPredictor * predictor)
     return false;
   }
 
-  fwrite("MH10", 1, 4, file);
-  fwrite(&predictor->error_symbol, 4, 1, file);
+  fwrite("MH11", 1, 4, file);
+  fwrite(&predictor->error_event, 4, 1, file);
   fwrite(&predictor->contexts_size, 4, 1, file);
   for (uint32_t i = 0; i < predictor->contexts_size; ++i)
   {
     SoothContext context = predictor->contexts[i];
-    fwrite(context.bigram, 4, 2, file);
+    fwrite(&context.id, 4, 1, file);
     fwrite(&context.count, 4, 1, file);
     fwrite(&context.statistics_size, 4, 1, file);
     fwrite(context.statistics, sizeof(SoothStatistic), context.statistics_size, file);
@@ -113,14 +93,14 @@ bool sooth_predictor_load(const char * const filename, SoothPredictor * predicto
 
   char code[4];
   fread(code, 1, 4, file);
-  if (strncmp(code, "MH10", 4) != 0)
+  if (strncmp(code, "MH11", 4) != 0)
   {
     return false;
   }
 
   sooth_predictor_clear(predictor);
 
-  fread(&predictor->error_symbol, 4, 1, file);
+  fread(&predictor->error_event, 4, 1, file);
   fread(&predictor->contexts_size, 4, 1, file);
   if (predictor->contexts_size == 0)
   {
@@ -130,19 +110,19 @@ bool sooth_predictor_load(const char * const filename, SoothPredictor * predicto
   if (predictor->contexts == NULL)
   {
     sooth_predictor_clear(predictor);
-    return NULL;
+    return false;
   }
   for (uint32_t i = 0; i < predictor->contexts_size; ++i)
   {
     SoothContext * context = &(predictor->contexts[i]);
-    fread(context->bigram, 4, 2, file);
+    fread(&context->id, 4, 1, file);
     fread(&context->count, 4, 1, file);
     fread(&context->statistics_size, 4, 1, file);
     context->statistics = malloc(sizeof(SoothStatistic) * context->statistics_size);
     if (context->statistics == NULL)
     {
       sooth_predictor_clear(predictor);
-      return NULL;
+      return false;
     }
     fread(context->statistics, sizeof(SoothStatistic), context->statistics_size, file);
   }
@@ -152,7 +132,7 @@ bool sooth_predictor_load(const char * const filename, SoothPredictor * predicto
 
 //------------------------------------------------------------------------------
 SoothContext *
-sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
+sooth_predictor_find_context(SoothPredictor * predictor, uint32_t id)
 {
   SoothContext * context = NULL;
   uint32_t mid = 0;
@@ -166,11 +146,11 @@ sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
     {
       mid = low + (high - low) / 2;
       context = &(predictor->contexts[mid]);
-      if (context->bigram[0] < bigram[0] || (context->bigram[0] == bigram[0] && context->bigram[1] < bigram[1]))
+      if (context->id < id)
       {
         low = mid + 1;
       }
-      else if (context->bigram[0] > bigram[0] || (context->bigram[0] == bigram[0] && context->bigram[1] > bigram[1]))
+      else if (context->id > id)
       {
         if (mid == 0)
         {
@@ -203,8 +183,7 @@ sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
   }
 
   context = &(predictor->contexts[mid]);
-  context->bigram[0] = bigram[0];
-  context->bigram[1] = bigram[1];
+  context->id = id;
   context->count = 0;
   context->statistics_size = 0;
   context->statistics = NULL;
@@ -215,7 +194,7 @@ sooth_predictor_find_context(SoothPredictor * predictor, uint32_t bigram[2])
 //------------------------------------------------------------------------------
 
 SoothStatistic *
-sooth_predictor_find_statistic(SoothContext * context, uint32_t symbol)
+sooth_predictor_find_statistic(SoothContext * context, uint32_t event)
 {
   SoothStatistic * statistic = NULL;
   uint32_t mid = 0;
@@ -229,11 +208,11 @@ sooth_predictor_find_statistic(SoothContext * context, uint32_t symbol)
     {
       mid = low + (high - low) / 2;
       statistic = &(context->statistics[mid]);
-      if (statistic->symbol < symbol)
+      if (statistic->event < event)
       {
         low = mid + 1;
       }
-      else if (statistic->symbol > symbol)
+      else if (statistic->event > event)
       {
         if (mid == 0)
         {
@@ -266,7 +245,7 @@ sooth_predictor_find_statistic(SoothContext * context, uint32_t symbol)
   }
 
   statistic = &(context->statistics[mid]);
-  statistic->symbol = symbol;
+  statistic->event = event;
   statistic->count = 0;
 
   return statistic;
@@ -275,16 +254,57 @@ sooth_predictor_find_statistic(SoothContext * context, uint32_t symbol)
 //------------------------------------------------------------------------------
 
 uint32_t
-sooth_predictor_observe(SoothPredictor * predictor, uint32_t bigram[2], uint32_t symbol)
+sooth_predictor_size(SoothPredictor * predictor, uint32_t id)
 {
-  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
+  
+  if (context == NULL)
+  {
+    return 0;
+  }
+
+  return context->statistics_size;
+}
+
+//------------------------------------------------------------------------------
+
+uint32_t
+sooth_predictor_count(SoothPredictor * predictor, uint32_t id)
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
+  
+  if (context == NULL)
+  {
+    return 0;
+  }
+
+  return context->count;
+}
+
+//------------------------------------------------------------------------------
+
+uint32_t
+sooth_predictor_observe(SoothPredictor * predictor, uint32_t id, uint32_t event)
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
 
   if (context == NULL)
   {
     return 0;
   }
 
-  SoothStatistic * statistic = sooth_predictor_find_statistic(context, symbol);
+  if (context->count == UINT32_MAX)
+  {
+    context->count = 0;
+    for (uint32_t i = 0; i < context->statistics_size; ++i)
+    {
+      SoothStatistic statistic = context->statistics[i];
+      statistic.count /= 2;
+      context->count += statistic.count;
+    }
+  }
+
+  SoothStatistic * statistic = sooth_predictor_find_statistic(context, event);
 
   if (statistic == NULL)
   {
@@ -300,28 +320,13 @@ sooth_predictor_observe(SoothPredictor * predictor, uint32_t bigram[2], uint32_t
 //------------------------------------------------------------------------------
 
 uint32_t
-sooth_predictor_count(SoothPredictor * predictor, uint32_t bigram[2])
+sooth_predictor_select(SoothPredictor * predictor, uint32_t id, uint32_t limit)
 {
-  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
-  
-  if (context == NULL)
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
+
+  if (context == NULL || limit == 0 || limit > context->count)
   {
-    return 0;
-  }
-
-  return context->count;
-}
-
-//------------------------------------------------------------------------------
-
-uint32_t
-sooth_predictor_select(SoothPredictor * predictor, uint32_t bigram[2], uint32_t limit)
-{
-  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
-
-  if (context == NULL || limit == 0)
-  {
-    return predictor->error_symbol;
+    return predictor->error_event;
   }
 
   for (uint32_t i = 0; i < context->statistics_size; ++i)
@@ -332,18 +337,33 @@ sooth_predictor_select(SoothPredictor * predictor, uint32_t bigram[2], uint32_t 
       limit -= statistic.count;
       continue;
     }
-    return statistic.symbol;
+    return statistic.event;
   }
 
-  return predictor->error_symbol;
+  return predictor->error_event;
+}
+
+//------------------------------------------------------------------------------
+
+SoothStatistic *
+sooth_predictor_distribution(SoothPredictor * predictor, uint32_t id)
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
+
+  if (context == NULL)
+  {
+    return NULL;
+  }
+
+  return context->statistics;
 }
 
 //------------------------------------------------------------------------------
 
 double
-sooth_predictor_uncertainty(SoothPredictor * predictor, uint32_t bigram[2])
+sooth_predictor_uncertainty(SoothPredictor * predictor, uint32_t id)
 {
-  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
 
   if (context == NULL || context->count == 0)
   {
@@ -366,16 +386,16 @@ sooth_predictor_uncertainty(SoothPredictor * predictor, uint32_t bigram[2])
 //------------------------------------------------------------------------------
 
 double
-sooth_predictor_surprise(SoothPredictor * predictor, uint32_t bigram[2], uint32_t symbol)
+sooth_predictor_surprise(SoothPredictor * predictor, uint32_t id, uint32_t event)
 {
-  SoothContext * context = sooth_predictor_find_context(predictor, bigram);
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
 
   if (context == NULL || context->count == 0)
   {
     return -1;
   }
 
-  SoothStatistic * statistic = sooth_predictor_find_statistic(context, symbol);
+  SoothStatistic * statistic = sooth_predictor_find_statistic(context, event);
 
   if (statistic == NULL || statistic->count == 0)
   {
