@@ -9,14 +9,12 @@
 
 typedef struct
 {
-  uint32_t bigram[2];
+  uint32_t id;
   uint32_t count;
   uint32_t statistics_size;
   SoothStatistic * statistics;
 }
 SoothContext;
-
-//------------------------------------------------------------------------------
 
 //==============================================================================
 
