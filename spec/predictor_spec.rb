@@ -42,22 +42,10 @@ describe Sooth::Predictor do
 
   describe "#size" do
     it "returns zero for an unobserved context" do
-      expect(predictor.count(1)).to eq(0)
-      expect(predictor.count).to eq(0)
+      expect(predictor.size(1)).to eq(0)
     end
 
-    it "returns the number of distinct contexts" do
-      predictor.observe(1, 2)
-      predictor.observe(2, 1)
-      predictor.observe(1, 4)
-      predictor.observe(1, 3)
-      predictor.observe(1, 0)
-      predictor.observe(2, 1)
-      predictor.observe(1, 4)
-      expect(predictor.count).to eq(2)
-    end
-
-    it "returns the number of distinct events when a context is given" do
+    it "returns the number of distinct events" do
       predictor.observe(1, 2)
       predictor.observe(1, 1)
       predictor.observe(1, 4)
@@ -65,7 +53,7 @@ describe Sooth::Predictor do
       predictor.observe(1, 0)
       predictor.observe(1, 1)
       predictor.observe(1, 4)
-      expect(predictor.count(1)).to eq(5)
+      expect(predictor.size(1)).to eq(5)
     end
 
   end

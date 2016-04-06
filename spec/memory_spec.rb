@@ -15,7 +15,7 @@ describe Sooth::Predictor do
       expect(predictor.observe(4, 1)).to eq(3)
       expect(predictor.observe(2, 1)).to eq(2)
       expect(predictor.observe(3, 1)).to eq(3)
-      expect(predictor.observe(3, 1)).to eq(3)
+      expect(predictor.observe(3, 1)).to eq(4)
     end
 
     it "does not segfault when sorting events" do
