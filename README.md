@@ -5,8 +5,10 @@
 Sooth
 =====
 
-Sooth is a simple stochastic predictive model. It is used by
-[MegaHAL](https://github.com/jasonhutchens/megahal), a learning chatterbot.
+Sooth is a minimal stochastic predictive model. It is used by
+[MegaHAL](https://github.com/jasonhutchens/megahal), a learning chatterbot, and
+by [Typing Simulator](https://github.com/jasonhutchens/typing_simulator), a
+program that pretends to type text files like a human being.
 
 Getting Started
 ---------------
@@ -16,4 +18,4 @@ Apart from the specs, look at the [API docs](http://www.rubydoc.info/gems/sooth/
 Copyright
 ---------
 
-Copyright (c) 2015 Jason Hutchens. See UNLICENSE for further details.
+Copyright (c) 2016 Jason Hutchens. See UNLICENSE for further details.
