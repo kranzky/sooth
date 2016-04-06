@@ -347,6 +347,21 @@ sooth_predictor_select(SoothPredictor * predictor, uint32_t id, uint32_t limit)
 
 //------------------------------------------------------------------------------
 
+SoothStatistic *
+sooth_predictor_distribution(SoothPredictor * predictor, uint32_t id)
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
+
+  if (context == NULL)
+  {
+    return NULL;
+  }
+
+  return context->statistics;
+}
+
+//------------------------------------------------------------------------------
+
 double
 sooth_predictor_uncertainty(SoothPredictor * predictor, uint32_t id)
 {

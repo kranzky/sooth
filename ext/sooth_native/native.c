@@ -131,7 +131,7 @@ VALUE method_sooth_native_select(VALUE self, VALUE context, VALUE limit);
  * together with its probability.
  *
  * @param [Fixnum] context A number that provides a context for observations.
- * @return [Enumerator] A collection of event-probability pairs.
+ * @return [Array] A list of event-probability pairs.
  */
 VALUE method_sooth_native_distribution(VALUE self, VALUE context);
 
@@ -312,7 +312,27 @@ method_sooth_native_select(VALUE self, VALUE context, VALUE limit)
 VALUE
 method_sooth_native_distribution(VALUE self, VALUE context)
 {
-  // TBD
+  SoothPredictor * predictor = NULL;
+  Check_Type(context, T_FIXNUM);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  uint32_t c_context = NUM2UINT(context);
+  SoothStatistic * statistics = sooth_predictor_distribution(predictor, c_context);
+  if (statistics == NULL)
+  {
+    return Qnil;
+  }
+  uint32_t size = sooth_predictor_size(predictor, c_context);
+  double count = (double)sooth_predictor_count(predictor, c_context);
+  VALUE r_array = rb_ary_new2(size);
+  for (uint32_t i = 0; i < size; ++i)
+  {
+    SoothStatistic statistic = statistics[i];
+    VALUE pair = rb_ary_new2(2);
+    rb_ary_store(pair, 0, UINT2NUM(statistic.event));
+    rb_ary_store(pair, 1, DBL2NUM((double)statistic.count/count));
+    rb_ary_store(r_array, i, pair);
+  }
+  return r_array;
 }
 
 //------------------------------------------------------------------------------

@@ -155,6 +155,26 @@ describe Sooth::Predictor do
     end
   end
 
+  describe "#distribution" do
+    it "has no distribution for a new context" do
+      expect(predictor.distribution(1)).to be_nil
+      expect(predictor.count(1)).to eq(0)
+      expect(predictor.uncertainty(1)).to be_nil
+    end
+
+    it "has a correct probability distribution" do
+      predictor.observe(1, 4)
+      predictor.observe(1, 2)
+      predictor.observe(1, 4)
+      predictor.observe(1, 3)
+      dist = Hash[predictor.distribution(1)]
+      expect(dist[1]).to be_nil
+      expect(dist[2]).to eq(0.25)
+      expect(dist[3]).to eq(0.25)
+      expect(dist[4]).to eq(0.5)
+    end
+  end
+
   describe "#uncertainty" do
     it "has no uncertainty for a new context" do
       expect(predictor.uncertainty(1)).to be_nil 
