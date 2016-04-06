@@ -14,8 +14,6 @@ sooth_predictor_init()
 {
   SoothPredictor * predictor = malloc(sizeof(SoothPredictor));
 
-  printf("Predictor size: %lu\n", sizeof(SoothPredictor));
-
   if (predictor == NULL)
   {
     return NULL;
