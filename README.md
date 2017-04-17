@@ -19,4 +19,4 @@ Look at the [API docs](http://www.rubydoc.info/gems/sooth/Sooth/Predictor) to ge
 Copyright
 ---------
 
-Copyright (c) 2016 Jason Hutchens. See UNLICENSE for further details.
+Copyright (c) 2017 Jason Hutchens. See UNLICENSE for further details.
