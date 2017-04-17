@@ -9,5 +9,5 @@ group :development do
   gem 'simplecov', '~> 0.9'
   gem 'byebug', '~> 8.2'
   gem 'rake-compiler', '~> 0.9'
-  gem 'github_changelog_generator', '~> 1.4'
+  gem 'github_changelog_generator', '~> 1.14'
 end
