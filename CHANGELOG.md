@@ -1,5 +1,8 @@
 # Change Log
 
+## [v2.1.0](https://github.com/jasonhutchens/sooth/tree/v2.1.0) (2017-04-17)
+[Full Changelog](https://github.com/jasonhutchens/sooth/compare/v2.0.0...v2.1.0)
+
 ## [v2.0.0](https://github.com/jasonhutchens/sooth/tree/v2.0.0) (2016-04-06)
 [Full Changelog](https://github.com/jasonhutchens/sooth/compare/v1.0.3...v2.0.0)
 
