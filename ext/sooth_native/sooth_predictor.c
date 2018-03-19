@@ -406,4 +406,26 @@ sooth_predictor_surprise(SoothPredictor * predictor, uint32_t id, uint32_t event
   return -log2(frequency);
 }
 
+//------------------------------------------------------------------------------
+
+double
+sooth_predictor_frequency(SoothPredictor * predictor, uint32_t id, uint32_t event)
+{
+  SoothContext * context = sooth_predictor_find_context(predictor, id);
+
+  if (context == NULL || context->count == 0)
+  {
+    return 0.0;
+  }
+
+  SoothStatistic * statistic = sooth_predictor_find_statistic(context, event);
+
+  if (statistic == NULL || statistic->count == 0)
+  {
+    return 0.0;
+  }
+
+  return (double)statistic->count / (double)context->count;
+}
+
 //==============================================================================

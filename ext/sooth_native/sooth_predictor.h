@@ -30,6 +30,7 @@ uint32_t sooth_predictor_select(SoothPredictor * predictor, uint32_t id, uint32_
 SoothStatistic * sooth_predictor_distribution(SoothPredictor * predictor, uint32_t id);
 double sooth_predictor_uncertainty(SoothPredictor * predictor, uint32_t id);
 double sooth_predictor_surprise(SoothPredictor * predictor, uint32_t id, uint32_t symbol);
+double sooth_predictor_frequency(SoothPredictor * predictor, uint32_t id, uint32_t symbol);
 
 //==============================================================================
 

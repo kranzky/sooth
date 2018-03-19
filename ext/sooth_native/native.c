@@ -43,7 +43,10 @@ void method_sooth_native_deallocate(void * predictor);
  *       def uncertainty(context)
  *         # (native code)
  *       end
- *       def surprise(context, evemt)
+ *       def surprise(context, event)
+ *         # (native code)
+ *       end
+ *       def frequency(context, event)
  *         # (native code)
  *       end
  *     end
@@ -159,6 +162,16 @@ VALUE method_sooth_native_uncertainty(VALUE self, VALUE context);
  */
 VALUE method_sooth_native_surprise(VALUE self, VALUE bigram, VALUE limit);
 
+/*
+ * Return a number indicating the frequency that the event has been observed
+ * within the given context.
+ *
+ * @param [Fixnum] context A number that provides a context for observations.
+ * @param [Fixnum] event A number representing the observed event.
+ * @return [Float] The frequency, as a number between 0.0 and 1.0
+ */
+VALUE method_sooth_native_frequency(VALUE self, VALUE bigram, VALUE limit);
+
 //------------------------------------------------------------------------------
 
 void Init_sooth_native()
@@ -181,6 +194,7 @@ void Init_sooth_native()
   rb_define_method(SoothNative, "distribution", method_sooth_native_distribution, 1);
   rb_define_method(SoothNative, "uncertainty", method_sooth_native_uncertainty, 1);
   rb_define_method(SoothNative, "surprise", method_sooth_native_surprise, 2);
+  rb_define_method(SoothNative, "frequency", method_sooth_native_frequency, 2);
 }
 
 //------------------------------------------------------------------------------
@@ -366,6 +380,18 @@ method_sooth_native_surprise(VALUE self, VALUE context, VALUE event)
     return Qnil;
   }
   return DBL2NUM(surprise);
+}
+
+//------------------------------------------------------------------------------
+
+VALUE
+method_sooth_native_frequency(VALUE self, VALUE context, VALUE event)
+{
+  SoothPredictor * predictor = NULL;
+  Check_Type(context, T_FIXNUM);
+  Check_Type(event, T_FIXNUM);
+  Data_Get_Struct(self, SoothPredictor, predictor);
+  return DBL2NUM(sooth_predictor_frequency(predictor, NUM2UINT(context), NUM2UINT(event)));
 }
 
 //==============================================================================

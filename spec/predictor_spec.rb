@@ -213,4 +213,25 @@ describe Sooth::Predictor do
       expect(predictor.surprise(1, 3)).to eq(8) 
     end
   end
+
+  describe "#frequency" do
+    it "returns zero for a new context" do
+      expect(predictor.frequency(1, 3)).to eq(0) 
+    end
+
+    it "returns zero for a new event" do
+      predictor.observe(1, 3)
+      expect(predictor.frequency(1, 4)).to eq(0) 
+    end
+
+    it "is one for a lone event" do
+      predictor.observe(1, 3)
+      expect(predictor.frequency(1, 3)).to eq(1) 
+    end
+
+    it "is uniform for a uniform distribution" do
+      (1..100).each { |i| predictor.observe(1, i) }
+      expect(predictor.frequency(1, 3)).to eq(0.01) 
+    end
+  end
 end
