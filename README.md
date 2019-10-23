@@ -1,5 +1,4 @@
 [![Gem Version](https://badge.fury.io/rb/sooth.svg)](http://badge.fury.io/rb/sooth)
-[![Dependency Status](https://gemnasium.com/kranzky/sooth.png)](https://gemnasium.com/kranzky/sooth)
 [![Codeship Status for jasonhutchens/sooth](https://codeship.com/projects/24d68130-e5b3-0132-369b-0addec64e5bc/status?branch=master)](https://codeship.com/projects/82075)
 
 Sooth
