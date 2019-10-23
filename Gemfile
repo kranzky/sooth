@@ -6,7 +6,7 @@ group :development do
   gem 'rdoc', '~> 6.0'
   gem 'jeweler', '~> 2.3'
   gem 'simplecov', '~> 0.15'
-  gem 'byebug', '~> 10.0'
+  gem 'byebug', '~> 11.0'
   gem 'rake-compiler', '~> 1.0'
   gem 'github_changelog_generator', '~> 1.14'
 end
