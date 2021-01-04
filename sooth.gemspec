@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/jasonhutchens/sooth".freeze
   s.licenses = ["UNLICENSE".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.1".freeze)
-  s.rubygems_version = "3.0.8".freeze
+  s.rubygems_version = "3.0.9".freeze
   s.summary = "Sooth is a simple stochastic predictive model.".freeze
 
   if s.respond_to? :specification_version then
