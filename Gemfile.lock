@@ -41,7 +41,7 @@ GEM
       retriable (~> 3.0)
     hashie (3.6.0)
     highline (2.0.3)
-    i18n (1.8.6)
+    i18n (1.8.7)
       concurrent-ruby (~> 1.0)
     juwelier (2.4.9)
       builder
