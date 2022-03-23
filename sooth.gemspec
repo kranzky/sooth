@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Jason Hutchens".freeze]
-  s.date = "2021-07-20"
+  s.date = "2022-03-23"
   s.description = "Sooth is a simple stochastic predictive model.".freeze
   s.email = "jasonhutchens@gmail.com".freeze
   s.extensions = ["ext/sooth_native/extconf.rb".freeze]
@@ -50,33 +50,33 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>.freeze, ["~> 3.10"])
+      s.add_development_dependency(%q<rspec>.freeze, ["~> 3.11"])
       s.add_development_dependency(%q<yard>.freeze, ["~> 0.9"])
-      s.add_development_dependency(%q<rdoc>.freeze, ["~> 6.3"])
+      s.add_development_dependency(%q<rdoc>.freeze, ["~> 6.4"])
       s.add_development_dependency(%q<juwelier>.freeze, ["~> 2.4"])
       s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.21"])
       s.add_development_dependency(%q<byebug>.freeze, ["~> 11.1"])
       s.add_development_dependency(%q<rake-compiler>.freeze, ["~> 1.1"])
-      s.add_development_dependency(%q<github_changelog_generator>.freeze, ["~> 1.15"])
+      s.add_development_dependency(%q<github_changelog_generator>.freeze, ["~> 1.16"])
     else
-      s.add_dependency(%q<rspec>.freeze, ["~> 3.10"])
+      s.add_dependency(%q<rspec>.freeze, ["~> 3.11"])
       s.add_dependency(%q<yard>.freeze, ["~> 0.9"])
-      s.add_dependency(%q<rdoc>.freeze, ["~> 6.3"])
+      s.add_dependency(%q<rdoc>.freeze, ["~> 6.4"])
       s.add_dependency(%q<juwelier>.freeze, ["~> 2.4"])
       s.add_dependency(%q<simplecov>.freeze, ["~> 0.21"])
       s.add_dependency(%q<byebug>.freeze, ["~> 11.1"])
       s.add_dependency(%q<rake-compiler>.freeze, ["~> 1.1"])
-      s.add_dependency(%q<github_changelog_generator>.freeze, ["~> 1.15"])
+      s.add_dependency(%q<github_changelog_generator>.freeze, ["~> 1.16"])
     end
   else
-    s.add_dependency(%q<rspec>.freeze, ["~> 3.10"])
+    s.add_dependency(%q<rspec>.freeze, ["~> 3.11"])
     s.add_dependency(%q<yard>.freeze, ["~> 0.9"])
-    s.add_dependency(%q<rdoc>.freeze, ["~> 6.3"])
+    s.add_dependency(%q<rdoc>.freeze, ["~> 6.4"])
     s.add_dependency(%q<juwelier>.freeze, ["~> 2.4"])
     s.add_dependency(%q<simplecov>.freeze, ["~> 0.21"])
     s.add_dependency(%q<byebug>.freeze, ["~> 11.1"])
     s.add_dependency(%q<rake-compiler>.freeze, ["~> 1.1"])
-    s.add_dependency(%q<github_changelog_generator>.freeze, ["~> 1.15"])
+    s.add_dependency(%q<github_changelog_generator>.freeze, ["~> 1.16"])
   end
 end
 
