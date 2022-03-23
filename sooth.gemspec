@@ -43,31 +43,22 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/jasonhutchens/sooth".freeze
   s.licenses = ["UNLICENSE".freeze]
   s.required_ruby_version = Gem::Requirement.new(">= 2.1".freeze)
-  s.rubygems_version = "3.0.9".freeze
+  s.rubygems_version = "3.2.32".freeze
   s.summary = "Sooth is a simple stochastic predictive model.".freeze
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
+  end
 
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<rspec>.freeze, ["~> 3.11"])
-      s.add_development_dependency(%q<yard>.freeze, ["~> 0.9"])
-      s.add_development_dependency(%q<rdoc>.freeze, ["~> 6.4"])
-      s.add_development_dependency(%q<juwelier>.freeze, ["~> 2.4"])
-      s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.21"])
-      s.add_development_dependency(%q<byebug>.freeze, ["~> 11.1"])
-      s.add_development_dependency(%q<rake-compiler>.freeze, ["~> 1.1"])
-      s.add_development_dependency(%q<github_changelog_generator>.freeze, ["~> 1.16"])
-    else
-      s.add_dependency(%q<rspec>.freeze, ["~> 3.11"])
-      s.add_dependency(%q<yard>.freeze, ["~> 0.9"])
-      s.add_dependency(%q<rdoc>.freeze, ["~> 6.4"])
-      s.add_dependency(%q<juwelier>.freeze, ["~> 2.4"])
-      s.add_dependency(%q<simplecov>.freeze, ["~> 0.21"])
-      s.add_dependency(%q<byebug>.freeze, ["~> 11.1"])
-      s.add_dependency(%q<rake-compiler>.freeze, ["~> 1.1"])
-      s.add_dependency(%q<github_changelog_generator>.freeze, ["~> 1.16"])
-    end
+  if s.respond_to? :add_runtime_dependency then
+    s.add_development_dependency(%q<rspec>.freeze, ["~> 3.11"])
+    s.add_development_dependency(%q<yard>.freeze, ["~> 0.9"])
+    s.add_development_dependency(%q<rdoc>.freeze, ["~> 6.4"])
+    s.add_development_dependency(%q<juwelier>.freeze, ["~> 2.4"])
+    s.add_development_dependency(%q<simplecov>.freeze, ["~> 0.21"])
+    s.add_development_dependency(%q<byebug>.freeze, ["~> 11.1"])
+    s.add_development_dependency(%q<rake-compiler>.freeze, ["~> 1.1"])
+    s.add_development_dependency(%q<github_changelog_generator>.freeze, ["~> 1.16"])
   else
     s.add_dependency(%q<rspec>.freeze, ["~> 3.11"])
     s.add_dependency(%q<yard>.freeze, ["~> 0.9"])
