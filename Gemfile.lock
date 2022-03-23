@@ -1,12 +1,11 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (6.1.5)
+    activesupport (7.0.2.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     async (1.30.1)
@@ -98,14 +97,12 @@ GEM
     jwt (2.3.0)
     kamelcase (0.0.2)
       semver2 (~> 3)
-    mini_portile2 (2.8.0)
     minitest (5.15.0)
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     nio4r (2.5.8)
-    nokogiri (1.13.3)
-      mini_portile2 (~> 2.8.0)
+    nokogiri (1.13.3-arm64-darwin)
       racc (~> 1.4)
     oauth2 (1.4.9)
       faraday (>= 0.17.3, < 3.0)
@@ -167,10 +164,9 @@ GEM
     webrick (1.7.0)
     yard (0.9.27)
       webrick (~> 1.7.0)
-    zeitwerk (2.5.4)
 
 PLATFORMS
-  ruby
+  arm64-darwin-21
 
 DEPENDENCIES
   byebug (~> 11.1)
@@ -183,4 +179,4 @@ DEPENDENCIES
   yard (~> 0.9)
 
 BUNDLED WITH
-   1.17.3
+   2.3.9
